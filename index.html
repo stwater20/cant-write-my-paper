@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>論文寫不出來?The Cursor Is Still Blinking… ・ 拖延語錄產生器</title>
+<meta name="description" content="論文寫不出來、對著空白文件發呆?這個小站收集研究生最真實的拖延語錄,也整理卡關的原因與解法,陪你在游標閃到天亮的深夜笑一下、再寫一句。For everyone staring at a blank page.">
+<meta name="keywords" content="論文寫不出來,寫作卡關,writer's block,拖延,論文拖延,寫不出來,thesis,研究生,拖延症">
+<meta property="og:title" content="論文寫不出來?The Cursor Is Still Blinking…">
+<meta property="og:description" content="收集研究生最真實的拖延語錄,整理卡關的原因與解法。按一下,再想一個不寫的理由,然後——先寫一句爛的吧。">
+<meta property="og:type" content="website">
+<style>
+  :root{
+    --bg:#0d1017; --bg2:#141924; --ink:#cbd2de; --muted:#6d7688;
+    --accent:#c79a4e; --mood:#8a93a6; --paper:#141a24; --line:#232b3a;
+    --cursor:#d8b25f; --card-grad1:#141a24; --card-grad2:#10151d;
+    --btn:#161d29; --btn-hover:#1f2836; --mote:150,165,190;
+    --primary-grad1:#2a2418; --primary-grad2:#201c13; --primary-border:#5a4a2a; --primary-ink:#e2cb8c;
+  }
+  [data-theme="light"]{
+    --bg:#eceae3; --bg2:#f6f4ee; --ink:#3c3a33; --muted:#9a9384;
+    --accent:#a67c2e; --mood:#847d70; --paper:#fffef8; --line:#e6e1d3;
+    --cursor:#b8862f; --card-grad1:#fffef8; --card-grad2:#f6f2e8;
+    --btn:#efece2; --btn-hover:#e6e1d3; --mote:150,150,138;
+    --primary-grad1:#f0e7d3; --primary-grad2:#e8ddc4; --primary-border:#cdb98a; --primary-ink:#6a552a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1100px 560px at 50% -12%, color-mix(in srgb, var(--accent) 15%, transparent) 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 72%, #000) 100%);
+    color:var(--ink);
+    font-family:"Georgia","Songti TC","Noto Serif TC",serif;
+    min-height:100vh; overflow-x:hidden; line-height:1.7;
+    transition:background .5s, color .5s;
+  }
+  #motes{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.7;}
+  .content{position:relative;z-index:2;max-width:760px;margin:0 auto;padding:64px 22px 100px;}
+
+  #theme{position:fixed;top:18px;right:18px;z-index:5;width:44px;height:44px;border-radius:50%;
+    border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;line-height:1;padding:0;
+    font-size:20px;font-family:-apple-system,"Segoe UI Emoji","Apple Color Emoji",sans-serif;
+    box-shadow:0 6px 20px rgba(0,0,0,.25);transition:background .25s,border-color .25s,transform .25s;}
+  #theme:hover{transform:scale(1.08);border-color:var(--accent);}
+
+  header{text-align:center;margin-bottom:54px;}
+  .kicker{letter-spacing:.35em;text-transform:uppercase;font-size:12px;color:var(--muted);font-family:-apple-system,"PingFang TC",sans-serif;}
+  h1{font-size:clamp(28px,6vw,44px);font-weight:400;margin:.4em 0 .2em;color:var(--ink);}
+  h1 .sub{display:block;font-size:15px;color:var(--muted);letter-spacing:.05em;margin-top:14px;font-style:italic;}
+  .envelope{font-size:40px;}
+
+  .blink{display:inline-block;width:.5ch;background:var(--cursor);color:transparent;margin-left:2px;
+    animation:blink 1.05s step-end infinite;border-radius:1px;}
+  @keyframes blink{50%{opacity:0;}}
+
+  .card{background:linear-gradient(180deg,var(--card-grad1),var(--card-grad2));
+    border:1px solid var(--line);border-radius:16px;padding:34px 30px;
+    box-shadow:0 30px 80px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.03);
+    position:relative;overflow:hidden;}
+  .card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.5;}
+  .stamp{position:absolute;top:18px;right:-32px;transform:rotate(15deg);
+    border:3px solid var(--accent);color:var(--accent);padding:4px 42px;font-family:-apple-system,"PingFang TC",sans-serif;
+    font-weight:800;letter-spacing:.12em;font-size:13px;opacity:.6;border-radius:4px;}
+  .letterhead{font-size:12px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;
+    font-family:-apple-system,sans-serif;margin-bottom:20px;border-bottom:1px dashed var(--line);padding-bottom:14px;}
+  #quote{font-size:clamp(19px,3.4vw,25px);min-height:132px;color:var(--ink);transition:opacity .4s;}
+  #quote .zh{display:block;margin-top:18px;font-size:15px;color:var(--mood);font-style:italic;
+    font-family:"Songti TC","Noto Serif TC",serif;}
+  .sign{margin-top:24px;font-size:14px;color:var(--muted);font-style:italic;text-align:right;}
+
+  .btn-row{display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap;}
+  button{font-family:-apple-system,"PingFang TC",sans-serif;background:var(--btn);color:var(--ink);
+    border:1px solid var(--line);padding:13px 26px;border-radius:10px;font-size:15px;cursor:pointer;
+    transition:background .2s,border-color .2s,transform .2s;}
+  button:hover{background:var(--btn-hover);border-color:var(--accent);transform:translateY(-1px);}
+  button.primary{background:linear-gradient(180deg,var(--primary-grad1),var(--primary-grad2));
+    border-color:var(--primary-border);color:var(--primary-ink);}
+  button.primary:hover{border-color:var(--accent);filter:brightness(1.05);}
+  .counter{text-align:center;color:var(--muted);font-size:13px;margin-top:20px;font-family:-apple-system,sans-serif;font-style:italic;}
+
+  .share{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:24px;flex-wrap:wrap;}
+  .share .lbl{font-size:12px;color:var(--muted);font-family:-apple-system,sans-serif;letter-spacing:.15em;text-transform:uppercase;margin-right:4px;}
+  .share a,.share button.s{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;
+    border-radius:50%;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;
+    text-decoration:none;font-size:15px;font-family:-apple-system,sans-serif;font-weight:600;transition:.2s;padding:0;}
+  .share a:hover,.share button.s:hover{transform:translateY(-2px);border-color:var(--accent);color:var(--accent);}
+  .share svg{width:18px;height:18px;fill:currentColor;}
+
+  .section-title{text-align:center;margin:80px 0 8px;font-size:26px;font-weight:400;color:var(--ink);}
+  .section-sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:40px;font-family:-apple-system,sans-serif;}
+  .reason{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--mood);
+    border-radius:10px;padding:20px 22px;margin-bottom:16px;transition:.25s;}
+  .reason:hover{border-left-color:var(--accent);transform:translateX(4px);}
+  .reason .rank{font-family:-apple-system,sans-serif;font-size:12px;color:var(--muted);letter-spacing:.1em;}
+  .reason .en{font-size:17px;color:var(--ink);margin:6px 0 8px;}
+  .reason .zh{font-size:14px;color:var(--mood);font-style:italic;}
+
+  footer{text-align:center;margin-top:70px;color:var(--muted);font-size:13px;
+    font-family:-apple-system,sans-serif;line-height:1.9;}
+  footer a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent);}
+  .tools{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);}
+  .tools a{font-weight:600;}
+  .contribute{margin-top:10px;}
+  .hr{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:60px 0;}
+  .longform{max-width:640px;margin:0 auto;padding:0 4px;}
+  .longform p{color:var(--ink);font-size:16px;line-height:1.95;margin:0 0 18px;opacity:.92;}
+  .longform p .k{color:var(--accent);font-weight:600;font-style:normal;}
+  .longform .en{font-size:14px;color:var(--muted);font-style:italic;margin-top:26px;}
+</style>
+</head>
+<body>
+<canvas id="motes"></canvas>
+<button id="theme" title="切換日間/夜間" onclick="toggleTheme()">☀️</button>
+<div class="content">
+
+  <header>
+    <div class="envelope">⌨️</div>
+    <div class="kicker">Manuscript Status</div>
+    <h1>The Cursor Is Still Blinking…<span class="blink">|</span>
+      <span class="sub">獻給每一個對著空白文件發呆、游標閃到天亮的深夜</span>
+    </h1>
+  </header>
+
+  <div class="card">
+    <div class="stamp">0 WORDS</div>
+    <div class="letterhead">Untitled.docx · 0 / 8,000 words · last saved <span id="msid">never</span></div>
+    <div id="quote"></div>
+    <div class="sign" id="sign">— Untitled.docx</div>
+  </div>
+
+  <div class="btn-row">
+    <button class="primary" onclick="stuck()">再想一個不寫的理由 · Another excuse</button>
+    <button onclick="saveImage()">存成圖片 · Save as image</button>
+    <button onclick="copyQuote()">複製這份拖延 · Copy</button>
+  </div>
+
+  <div class="share">
+    <span class="lbl">Share</span>
+    <a id="sh-x" target="_blank" rel="noopener" title="分享到 X / Twitter">
+      <svg viewBox="0 0 24 24"><path d="M18.9 1.9h3.6l-7.9 9 9.3 12.3h-7.3l-5.7-7.5-6.5 7.5H.7l8.4-9.6L0 1.9h7.5l5.2 6.9 6.2-6.9Zm-1.3 19.5h2L6.5 3.9h-2.1l13.2 17.5Z"/></svg>
+    </a>
+    <a id="sh-fb" target="_blank" rel="noopener" title="分享到 Facebook">
+      <svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12Z"/></svg>
+    </a>
+    <a id="sh-line" target="_blank" rel="noopener" title="分享到 LINE">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 5.6 2 10.1c0 4 3.6 7.4 8.4 8 .3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.6 1.1-.5 6-3.5 8.1-6C21.5 13.4 22 11.8 22 10.1 22 5.6 17.5 2 12 2ZM8 12.8H6c-.2 0-.4-.2-.4-.4V8.9c0-.2.2-.4.4-.4s.4.2.4.4V12h1.6c.2 0 .4.2.4.4s-.2.4-.4.4Zm1.6-.4c0 .2-.2.4-.4.4s-.4-.2-.4-.4V8.9c0-.2.2-.4.4-.4s.4.2.4.4v3.5Zm4.2 0c0 .2-.1.3-.3.4h-.1c-.1 0-.3-.1-.3-.2l-1.5-2v1.8c0 .2-.2.4-.4.4s-.4-.2-.4-.4V8.9c0-.2.1-.3.3-.4.1 0 .3 0 .4.2l1.5 2V8.9c0-.2.2-.4.4-.4s.4.2.4.4v3.5Zm3-2.1c.2 0 .4.2.4.4s-.2.4-.4.4h-1.1v.9h1.1c.2 0 .4.2.4.4s-.2.4-.4.4h-1.5c-.2 0-.4-.2-.4-.4V8.9c0-.2.2-.4.4-.4h1.5c.2 0 .4.2.4.4s-.2.4-.4.4h-1.1v.9h1.1Z"/></svg>
+    </a>
+    <a id="sh-th" target="_blank" rel="noopener" title="分享到 Threads">
+      <svg viewBox="0 0 24 24"><path d="M12.2 22h-.1c-2.9 0-5.1-.9-6.6-2.7C4.1 17.6 3.4 15.2 3.4 12v0c0-3.2.7-5.6 2.1-7.3C7 2.9 9.2 2 12.1 2h.1c2.2 0 4 .5 5.4 1.5 1.3 1 2.2 2.3 2.7 4l-2 .6c-.8-2.6-2.6-3.9-6.1-4h0c-2.3 0-4 .7-5 2-1 1.3-1.5 3.2-1.5 5.9v0c0 2.7.5 4.6 1.5 5.9 1 1.3 2.7 2 5 2h0c2.1 0 3.4-.5 4.6-1.6 1.3-1.3 1.3-2.9 1-3.8-.2-.6-.6-1.1-1.2-1.5-.1 1.1-.4 2-1 2.7-.8.9-2 1.4-3.5 1.4-1.1 0-2.1-.3-2.8-.9-.8-.7-1.2-1.6-1.2-2.6 0-2 1.6-3.4 4.2-3.4.7 0 1.4.1 2 .2 0-.5-.2-.9-.4-1.2-.4-.4-.9-.6-1.7-.6h0c-1 0-1.7.4-2.1 1.2l-1.8-1c.8-1.4 2.1-2.1 3.9-2.1h0c2.6 0 4.1 1.6 4.3 4.3l0 .1c1.4.7 2.4 1.8 2.9 3.2.6 1.8.3 4.2-1.6 6.1C16.5 21.3 14.6 22 12.2 22Zm-.7-8.5c-1.6 0-2.3.7-2.3 1.4 0 .8.9 1.3 1.9 1.3.9 0 2.1-.3 2.3-2.4-.6-.2-1.2-.3-1.9-.3Z"/></svg>
+    </a>
+    <button class="s" title="複製連結" onclick="copyLink()">🔗</button>
+    <button class="s" id="native-share" title="系統分享" style="display:none" onclick="nativeShare()">⇪</button>
+  </div>
+
+  <div class="counter" id="counter">你已經盯著空白文件 0 次。要不要先寫一句爛的?</div>
+
+  <div class="hr"></div>
+
+  <h2 class="section-title">為什麼寫不出來?</h2>
+  <p class="section-sub">Why you're stuck — 每一個卡點,都有一個小小的解法</p>
+  <div id="reasons"></div>
+
+  <div class="hr"></div>
+
+  <h2 class="section-title">論文寫不出來,怎麼辦?</h2>
+  <div class="longform">
+    <p>對著空白文件發呆的深夜,游標一閃一閃,一個字都擠不出來——<span class="k">論文寫不出來</span>不是因為你不夠聰明或不夠努力,而是因為『開始』本身就是最難的一步。幾乎每個寫過論文的人,都有過那種一小時字數還是 0 的夜晚。</p>
+    <p>卡住的時候,別急著逼自己寫出完美的句子。試試看:設一個 25 分鐘的番茄鐘,只准打字、不准查資料;允許自己先寫一段很爛的初稿,反正之後會改;把『寫完這一章』縮小成『寫完這一句』。動起來,比等靈感有用。</p>
+    <p>如果今天真的一個字都寫不出來,也沒關係——有時候那不是懶,是累。休息一下、睡飽一點,明天的你會比硬撐的你寫得更好。這個小站不會幫你寫論文,但至少會在你卡住的時候陪你笑一下,提醒你:游標明天還在,你也還在。</p>
+    <p class="en">A blinking cursor on a blank page at 3 AM is a rite of passage. Writer's block isn't a lack of talent — starting is just the hardest part. Set a 25-minute timer, allow yourself a terrible first draft, and shrink "write the chapter" into "write one sentence." And if nothing comes today, rest — that counts too.</p>
+  </div>
+
+  <footer>
+    獻給每一個對著空白文件發呆、游標閃到天亮的深夜。<br>
+    For everyone staring at a blank page while the cursor blinks back.<br>
+    <span style="opacity:.75">先寫一句爛的,永遠好過完美的空白。這一頁,陪你撐到寫出第一個字。</span>
+    <div class="contribute" style="margin-top:16px">
+      換個心情?去 <a href="https://we-regret-to-inform-you.sectools.tw" target="_blank" rel="noopener">被拒絕暖身版</a> 或 <a href="https://we-are-pleased-to-inform-you.sectools.tw" target="_blank" rel="noopener">恭喜錄取版</a> 走走。
+    </div>
+    <div class="contribute">
+      有你自己的拖延語錄?歡迎 <a href="https://github.com/stwater20/cant-write-my-paper/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">發 PR 貢獻一句</a> ⌛
+    </div>
+    <div class="tools">
+      更多工具 / More tools → <a href="https://sectools.tw/tools" target="_blank" rel="noopener">sectools.tw/tools</a>
+    </div>
+  </footer>
+</div>
+
+<!-- 資料檔:想加語錄請編輯 quotes.js;想加原因請編輯 reasons.js -->
+<script src="quotes.js"></script>
+<script src="reasons.js"></script>
+<script>
+const QUOTES = (window.QUOTES && window.QUOTES.length) ? window.QUOTES
+  : [{en:"Even the data file couldn't get started today.", zh:"連資料檔今天都不想動。"}];
+const REASONS = window.REASONS || [];
+const signs = ["— Untitled.docx","— Your blinking cursor","— The blank page","— Chapter 1 (still empty)","— 3:47 AM","— Your unwritten thesis","— Word count: 0"];
+
+let count = 0, current = 0;
+const SITE = location.href.split('#')[0].split('?')[0];
+
+function pick(prev, n){ let i; do{ i=Math.floor(Math.random()*n);}while(i===prev && n>1); return i; }
+
+function updateShare(){
+  const q=QUOTES[current];
+  const text=`“${q.en}” — ${q.zh}`;
+  const u=encodeURIComponent(SITE), t=encodeURIComponent(text);
+  document.getElementById('sh-x').href=`https://twitter.com/intent/tweet?text=${t}&url=${u}`;
+  document.getElementById('sh-fb').href=`https://www.facebook.com/sharer/sharer.php?u=${u}`;
+  document.getElementById('sh-line').href=`https://social-plugins.line.me/lineit/share?url=${u}&text=${t}`;
+  document.getElementById('sh-th').href=`https://www.threads.net/intent/post?text=${t}%20${u}`;
+}
+
+function stuck(){
+  const box=document.getElementById('quote');
+  box.style.opacity=0;
+  setTimeout(()=>{
+    current=pick(current,QUOTES.length);
+    const q=QUOTES[current];
+    box.innerHTML=`“${q.en}”<span class="blink">|</span><span class="zh">${q.zh}</span>`;
+    document.getElementById('sign').textContent=signs[Math.floor(Math.random()*signs.length)];
+    box.style.opacity=1;
+    count++;
+    document.getElementById('counter').textContent=`你已經盯著空白文件 ${count} 次。要不要先寫一句爛的?`;
+    updateShare();
+  },300);
+}
+
+function flash(msg){
+  const c=document.getElementById('counter'); const t=c.textContent;
+  c.textContent=msg; setTimeout(()=>c.textContent=t,1500);
+}
+function copyQuote(){
+  const q=QUOTES[current];
+  navigator.clipboard.writeText(`“${q.en}”\n${q.zh}`).then(()=>flash("已複製這份拖延到剪貼簿 ⌛")).catch(()=>{});
+}
+function copyLink(){
+  navigator.clipboard.writeText(SITE).then(()=>flash("已複製網站連結 🔗")).catch(()=>{});
+}
+function nativeShare(){
+  const q=QUOTES[current];
+  navigator.share({title:"The Cursor Is Still Blinking…",text:`“${q.en}” — ${q.zh}`,url:SITE}).catch(()=>{});
+}
+
+/* ---- save current line as an image ---- */
+function roundRect(g,x,y,w,h,r){
+  g.beginPath(); g.moveTo(x+r,y);
+  g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r);
+  g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath();
+}
+function wrapText(g,text,maxWidth){
+  const lines=[]; let line='';
+  for(const ch of text){
+    const test=line+ch;
+    if(g.measureText(test).width>maxWidth && line!==''){
+      if(ch===' '){ lines.push(line); line=''; continue; }
+      const sp=line.lastIndexOf(' ');
+      if(sp>0 && /[A-Za-z0-9.,;:!?'"()\-]/.test(ch)){ lines.push(line.slice(0,sp)); line=line.slice(sp+1)+ch; }
+      else { lines.push(line); line=ch; }
+    } else { line=test; }
+  }
+  if(line) lines.push(line);
+  return lines;
+}
+function renderLetterCanvas(){
+  const cs=getComputedStyle(document.documentElement);
+  const v=(n,f)=>{ const s=cs.getPropertyValue(n).trim(); return s||f; };
+  const q=QUOTES[current];
+  const sign=document.getElementById('sign').textContent;
+  const W=1080,H=1160;
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  const g=cv.getContext('2d');
+
+  g.fillStyle=v('--bg','#0d1017'); g.fillRect(0,0,W,H);
+  const glow=g.createRadialGradient(W/2,-120,60,W/2,-120,760);
+  glow.addColorStop(0,'rgba('+v('--mote','150,165,190')+',0.10)');
+  glow.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=glow; g.fillRect(0,0,W,H);
+
+  // floating motes
+  g.fillStyle='rgba('+v('--mote','150,165,190')+',0.20)';
+  for(let i=0;i<70;i++){ g.beginPath(); g.arc(Math.random()*W,Math.random()*H,1+Math.random()*2.2,0,7); g.fill(); }
+
+  g.textAlign='center'; g.textBaseline='alphabetic';
+  g.fillStyle=v('--muted','#6d7688');
+  g.font='600 24px -apple-system,"PingFang TC",sans-serif';
+  g.fillText('T H E   C U R S O R   I S   S T I L L   B L I N K I N G …', W/2, 92);
+
+  const cx=70,cy=150,cw=940,chh=860,r=26;
+  roundRect(g,cx,cy,cw,chh,r);
+  const cg=g.createLinearGradient(0,cy,0,cy+chh);
+  cg.addColorStop(0,v('--card-grad1','#141a24')); cg.addColorStop(1,v('--card-grad2','#10151d'));
+  g.fillStyle=cg; g.fill();
+  g.lineWidth=1.5; g.strokeStyle=v('--line','#232b3a'); g.stroke();
+
+  g.save(); roundRect(g,cx,cy,cw,chh,r); g.clip();
+  g.globalAlpha=.5; g.fillStyle=v('--accent','#c79a4e'); g.fillRect(cx,cy,cw,5); g.globalAlpha=1;
+  g.restore();
+
+  const padX=cx+56;
+  let ty=cy+92;
+  g.textAlign='left';
+  g.fillStyle=v('--muted','#6d7688');
+  g.font='600 21px -apple-system,"PingFang TC",sans-serif';
+  g.fillText('UNTITLED.DOCX · 0 / 8,000 WORDS · LAST SAVED NEVER', padX, ty);
+  ty+=22;
+  g.strokeStyle=v('--line','#232b3a'); g.setLineDash([6,6]); g.lineWidth=1;
+  g.beginPath(); g.moveTo(padX,ty); g.lineTo(cx+cw-56,ty); g.stroke(); g.setLineDash([]);
+  ty+=78;
+
+  g.fillStyle=v('--ink','#cbd2de');
+  g.font='400 44px Georgia,"Songti TC","Noto Serif TC",serif';
+  const qlines=wrapText(g,'“'+q.en+'”',cw-112);
+  qlines.forEach((l,i)=>{ g.fillText(l,padX,ty); if(i===qlines.length-1){ const w=g.measureText(l).width; g.fillStyle=v('--cursor','#d8b25f'); g.fillRect(padX+w+8,ty-32,10,38); g.fillStyle=v('--ink','#cbd2de'); } ty+=58; });
+  ty+=30;
+
+  g.fillStyle=v('--mood','#8a93a6');
+  g.font='italic 29px Georgia,"Songti TC","Noto Serif TC",serif';
+  wrapText(g,q.zh,cw-112).forEach(l=>{ g.fillText(l,padX,ty); ty+=42; });
+
+  g.textAlign='right'; g.fillStyle=v('--muted','#6d7688');
+  g.font='italic 26px Georgia,"Songti TC",serif';
+  g.fillText(sign, cx+cw-56, cy+chh-48);
+
+  g.save();
+  g.translate(cx+cw-150, cy+118); g.rotate(-15*Math.PI/180);
+  g.globalAlpha=.62; g.strokeStyle=v('--accent','#c79a4e'); g.lineWidth=4;
+  roundRect(g,-116,-34,232,68,6); g.stroke();
+  g.fillStyle=v('--accent','#c79a4e'); g.textAlign='center'; g.textBaseline='middle';
+  g.font='800 30px -apple-system,"PingFang TC",sans-serif';
+  g.fillText('0   W O R D S',0,3);
+  g.restore(); g.globalAlpha=1; g.textBaseline='alphabetic';
+
+  g.textAlign='center'; g.fillStyle=v('--muted','#6d7688');
+  g.font='500 26px -apple-system,"PingFang TC","Segoe UI Emoji","Apple Color Emoji",sans-serif';
+  g.fillText('cant-write-my-paper.sectools.tw  ⌛', W/2, cy+chh+70);
+
+  return cv;
+}
+function saveImage(){
+  try{
+    const cv=renderLetterCanvas();
+    cv.toBlob(function(b){
+      if(!b){ flash("圖片產生失敗,再試一次 🥲"); return; }
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(b); a.download='still-blank.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+      flash("已存成圖片,存證你今天有『在寫』⌛");
+    },'image/png');
+  }catch(e){ flash("圖片產生失敗,再試一次 🥲"); }
+}
+
+/* theme */
+function applyTheme(m){
+  document.documentElement.setAttribute('data-theme',m);
+  document.getElementById('theme').textContent = m==='light' ? '🌙' : '☀️';
+}
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
+  const next=cur==='light'?'dark':'light';
+  applyTheme(next);
+  try{localStorage.setItem('cwp-theme',next);}catch(e){}
+}
+(function(){
+  let saved='dark';
+  try{saved=localStorage.getItem('cwp-theme')|| (matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');}catch(e){}
+  applyTheme(saved);
+})();
+
+document.getElementById('reasons').innerHTML=REASONS.map((r,i)=>
+  `<div class="reason"><div class="rank">REASON #${i+1}</div>
+   <div class="en">${r.title} — ${r.en}</div>
+   <div class="zh">${r.zh}</div></div>`).join('');
+
+if(navigator.share) document.getElementById('native-share').style.display='inline-flex';
+stuck();
+
+/* ---- drifting dust motes ---- */
+const c=document.getElementById('motes'), x=c.getContext('2d');
+let W,H,motes;
+function resize(){W=c.width=innerWidth;H=c.height=innerHeight;
+  motes=Array.from({length:Math.min(90,Math.floor(W/16))},()=>({
+    x:Math.random()*W,y:Math.random()*H,rd:0.7+Math.random()*2,
+    vy:-(0.15+Math.random()*0.35),sw:0.3+Math.random()*0.8,ph:Math.random()*6.28,o:.15+Math.random()*.4}));}
+resize(); addEventListener('resize',resize);
+function draw(){
+  x.clearRect(0,0,W,H);
+  const rc=getComputedStyle(document.documentElement).getPropertyValue('--mote').trim();
+  motes.forEach(m=>{
+    x.fillStyle=`rgba(${rc},${m.o})`;
+    x.beginPath(); x.arc(m.x,m.y,m.rd,0,7); x.fill();
+    m.y+=m.vy; m.x+=Math.sin(m.y/50+m.ph)*m.sw;
+    if(m.y<-10){ m.y=H+10; m.x=Math.random()*W; }
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>
